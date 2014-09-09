@@ -70,18 +70,19 @@ const GLubyte Indices[] = {
   22, 23, 20
 };
 
-@interface TOMOpenGLView () <GLKViewDelegate>
+@interface TOMOpenGLView () <GLKViewDelegate, UIScrollViewDelegate>
 {
-  BOOL _increasing;
   GLuint _vertexBuffer;
   GLuint _indexBuffer;
   GLuint _vertexArray;
-  //float _rotation;
 }
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) GLKBaseEffect *effect;
-@property (nonatomic, strong) CADisplayLink *displayLink;
+
+@property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UIView *dummyView;
+@property (nonatomic) BOOL shouldInhibitRotation;
 
 @end
 
@@ -89,7 +90,6 @@ const GLubyte Indices[] = {
 
 - (void)dealloc
 {
-  [self.displayLink invalidate];
   [self stopRender];
 
   if ([[EAGLContext currentContext] isEqual:self.context])
@@ -105,6 +105,20 @@ const GLubyte Indices[] = {
   self.enableSetNeedsDisplay = NO;
   self.opaque = NO;
 
+  UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+  scrollView.delegate = self;
+  scrollView.contentSize = CGSizeMake(100000, 100000);
+  scrollView.contentOffset = CGPointMake(scrollView.contentSize.width / 2.0, scrollView.contentSize.height / 2.0);
+  scrollView.showsHorizontalScrollIndicator = NO;
+  scrollView.showsVerticalScrollIndicator = NO;
+  scrollView.pagingEnabled = NO;
+  [self addSubview:scrollView];
+
+  self.dummyView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, scrollView.contentSize.width, scrollView.contentSize.height)];
+  [scrollView addSubview:self.dummyView];
+
+  self.scrollView = scrollView;
+
   self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 
   if (nil == self.context)
@@ -118,28 +132,25 @@ const GLubyte Indices[] = {
   self.context = self.context;
   self.drawableMultisample = GLKViewDrawableMultisample4X;
 
+  [self setupOpenGL];
+
   return self;
+}
+
+- (void)setMaximumZoomScale:(CGFloat)maximumZoomScale
+{
+  _maximumZoomScale = maximumZoomScale;
+  self.scrollView.maximumZoomScale = self.maximumZoomScale;
+}
+
+- (void)setupOpenGL
+{
+  [EAGLContext setCurrentContext:self.context];
+  glEnable(GL_CULL_FACE);
 }
 
 - (void)startRender
 {
-  [EAGLContext setCurrentContext:self.context];
-  glEnable(GL_CULL_FACE);
-
-  self.effect = [[GLKBaseEffect alloc] init];
-
-  NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
-  NSError *error;
-  NSString *path = [[NSBundle mainBundle] pathForResource:@"tile_floor" ofType:@"png"];
-  GLKTextureInfo * info = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
-  if (nil == info)
-  {
-    NSLog(@"Error loading file: %@", [error localizedDescription]);
-  }
-
-  self.effect.texture2d0.name = info.name;
-  self.effect.texture2d0.enabled = true;
-
   // New lines
   glGenVertexArraysOES(1, &_vertexArray);
   glBindVertexArrayOES(_vertexArray);
@@ -164,8 +175,8 @@ const GLubyte Indices[] = {
   // New line
   glBindVertexArrayOES(0);
 
-  self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(update:)];
-  [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+  self.zoomScale = 1.0;
+  self.rotation = (TOMOpenGLViewRotation){0.0, 0.0, 0.0};
 }
 
 - (void)stopRender
@@ -182,25 +193,60 @@ const GLubyte Indices[] = {
 - (void)setObjFilename:(NSString *)objFilename
 {
   _objFilename = objFilename;
+
+  // TODO: Implement
 }
 
 - (void)setTextureFilename:(NSString *)textureFilename
 {
   _textureFilename = textureFilename;
+
+  self.effect = [[GLKBaseEffect alloc] init];
+
+  NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
+  NSError *error;
+  NSString *path = [[NSBundle mainBundle] pathForResource:self.textureFilename ofType:@"png"];
+  GLKTextureInfo *info = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
+  if (nil == info)
+  {
+    NSLog(@"Error loading file: %@", [error localizedDescription]);
+  }
+
+  self.effect.texture2d0.name = info.name;
+  self.effect.texture2d0.enabled = true;
 }
 
 - (void)setRotation:(TOMOpenGLViewRotation)rotation
 {
   _rotation = rotation;
 
+  GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0, 0.0, -6.0);
+  modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, GLKMathDegreesToRadians(self.rotation.x), 0, 1, 0);
+  modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, GLKMathDegreesToRadians(self.rotation.y), 1, 0, 0);
+  self.effect.transform.modelviewMatrix = modelViewMatrix;
+
+  [self display];
+
+  if ([self.moveDelegate respondsToSelector:@selector(openGLViewDidRotate:)])
+  {
+    [self.moveDelegate openGLViewDidRotate:self];
+  }
+}
+
+- (void)setZoomScale:(CGFloat)zoomScale
+{
+  _zoomScale = zoomScale;
+
   float aspect = fabsf(self.bounds.size.width / self.bounds.size.height);
-  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 4.0f, 10.0f);
+  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0 / self.zoomScale), aspect, 4.0, 10.0);
   self.effect.transform.projectionMatrix = projectionMatrix;
 
-  GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -6.0f);
-  modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, GLKMathDegreesToRadians(25), 1, 0, 0);
-  modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, GLKMathDegreesToRadians(self.rotation.x), 0, 1, 0);
-  self.effect.transform.modelviewMatrix = modelViewMatrix;
+  [self display];
+
+  if ([self.moveDelegate respondsToSelector:@selector(openGLViewDidZoom:)])
+  {
+    [self.moveDelegate openGLViewDidZoom:self];
+  }
 }
 
 #pragma mark - GLKView Delegate
@@ -217,34 +263,46 @@ const GLubyte Indices[] = {
 
 }
 
-- (void)update:(CADisplayLink *)sender
+#pragma mark - UIScrollView Delegates
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  /*
-  static NSDate *previousTime;
-  NSTimeInterval timeSinceLastUpdate;
-
-  if (previousTime)
+  if (self.shouldInhibitRotation)
   {
-    timeSinceLastUpdate = [[NSDate date] timeIntervalSinceDate:previousTime];
-  }
-  else
-  {
-    timeSinceLastUpdate = 0;
+    self.shouldInhibitRotation = NO;
+    return;
   }
 
-  previousTime = [NSDate date];
+  static CGPoint previousPoint;
+  CGPoint point = scrollView.contentOffset;
+  if (0 == previousPoint.x && 0 == previousPoint.y)
+  {
+    previousPoint = point;
+  }
 
-  float aspect = fabsf(self.bounds.size.width / self.bounds.size.height);
-  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 4.0f, 10.0f);
-  self.effect.transform.projectionMatrix = projectionMatrix;
+  TOMOpenGLViewRotation currentRotation = self.rotation;
+  CGFloat xOffset = (point.x - previousPoint.x) * 0.5;
+  CGFloat yOffset = (point.y - previousPoint.y) * 0.5;
+  self.rotation = (TOMOpenGLViewRotation){currentRotation.x - xOffset, currentRotation.y - yOffset, 0.0};
 
-  GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, -6.0f);
-  _rotation += 90 * timeSinceLastUpdate;
-  modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, GLKMathDegreesToRadians(25), 1, 0, 0);
-  modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, GLKMathDegreesToRadians(_rotation), 0, 1, 0);
-  self.effect.transform.modelviewMatrix = modelViewMatrix;
-*/
-  [self display];
+  previousPoint = point;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+  self.shouldInhibitRotation = YES;
+  scrollView.contentOffset = CGPointMake(scrollView.contentSize.width / 2.0, scrollView.contentSize.height / 2.0);
+}
+
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView
+{
+  self.shouldInhibitRotation = YES;
+  self.zoomScale = scrollView.zoomScale;
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+  return self.dummyView;
 }
 
 @end
