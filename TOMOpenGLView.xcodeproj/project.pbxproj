@@ -21,10 +21,12 @@
 		F1126A3219BE419200FF3384 /* TOMOpenGLViewTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F1126A3119BE419200FF3384 /* TOMOpenGLViewTests.m */; };
 		F1126A3F19BE4BBB00FF3384 /* GLKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1126A3E19BE4BBB00FF3384 /* GLKit.framework */; };
 		F1126A4119BE4D2400FF3384 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1126A4019BE4D2400FF3384 /* OpenGLES.framework */; };
-		F1126A4519BE509900FF3384 /* tile_floor.png in Resources */ = {isa = PBXBuildFile; fileRef = F1126A4319BE509900FF3384 /* tile_floor.png */; };
 		F1126A4C19BE568600FF3384 /* TOMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1126A4719BE515700FF3384 /* TOMViewController.m */; };
 		F1126A4D19BE568A00FF3384 /* TOMOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1126A3C19BE41D100FF3384 /* TOMOpenGLView.m */; };
 		F1126A4F19BE59AE00FF3384 /* new_york_skyline.png in Resources */ = {isa = PBXBuildFile; fileRef = F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */; };
+		F1B4088119C0D900007653C4 /* 8_Black_Throated_Gray.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F1B4088019C0D900007653C4 /* 8_Black_Throated_Gray.jpg */; };
+		F1B4089319C0E983007653C4 /* 8_Black_Throated_Gray.mtl in Resources */ = {isa = PBXBuildFile; fileRef = F1B4089119C0E983007653C4 /* 8_Black_Throated_Gray.mtl */; };
+		F1B4089419C0E983007653C4 /* 8_Black_Throated_Gray.obj in Resources */ = {isa = PBXBuildFile; fileRef = F1B4089219C0E983007653C4 /* 8_Black_Throated_Gray.obj */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,10 +60,12 @@
 		F1126A3C19BE41D100FF3384 /* TOMOpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMOpenGLView.m; sourceTree = "<group>"; };
 		F1126A3E19BE4BBB00FF3384 /* GLKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLKit.framework; path = System/Library/Frameworks/GLKit.framework; sourceTree = SDKROOT; };
 		F1126A4019BE4D2400FF3384 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		F1126A4319BE509900FF3384 /* tile_floor.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tile_floor.png; sourceTree = "<group>"; };
 		F1126A4619BE515700FF3384 /* TOMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMViewController.h; sourceTree = "<group>"; };
 		F1126A4719BE515700FF3384 /* TOMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMViewController.m; sourceTree = "<group>"; };
 		F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_york_skyline.png; sourceTree = "<group>"; };
+		F1B4088019C0D900007653C4 /* 8_Black_Throated_Gray.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 8_Black_Throated_Gray.jpg; sourceTree = "<group>"; };
+		F1B4089119C0E983007653C4 /* 8_Black_Throated_Gray.mtl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 8_Black_Throated_Gray.mtl; sourceTree = "<group>"; };
+		F1B4089219C0E983007653C4 /* 8_Black_Throated_Gray.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = 8_Black_Throated_Gray.obj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -125,8 +129,10 @@
 		F1126A1219BE419200FF3384 /* TOMOpenGLView */ = {
 			isa = PBXGroup;
 			children = (
+				F1B4089119C0E983007653C4 /* 8_Black_Throated_Gray.mtl */,
+				F1B4089219C0E983007653C4 /* 8_Black_Throated_Gray.obj */,
+				F1B4088019C0D900007653C4 /* 8_Black_Throated_Gray.jpg */,
 				F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */,
-				F1126A4319BE509900FF3384 /* tile_floor.png */,
 				F1126A1B19BE419200FF3384 /* TOMAppDelegate.h */,
 				F1126A1C19BE419200FF3384 /* TOMAppDelegate.m */,
 				F1126A4619BE515700FF3384 /* TOMViewController.h */,
@@ -244,9 +250,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1126A4519BE509900FF3384 /* tile_floor.png in Resources */,
+				F1B4088119C0D900007653C4 /* 8_Black_Throated_Gray.jpg in Resources */,
+				F1B4089419C0E983007653C4 /* 8_Black_Throated_Gray.obj in Resources */,
 				F1126A1719BE419200FF3384 /* InfoPlist.strings in Resources */,
 				F1126A1F19BE419200FF3384 /* Images.xcassets in Resources */,
+				F1B4089319C0E983007653C4 /* 8_Black_Throated_Gray.mtl in Resources */,
 				F1126A4F19BE59AE00FF3384 /* new_york_skyline.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -468,6 +476,7 @@
 				F1126A3719BE419200FF3384 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		F1126A3819BE419200FF3384 /* Build configuration list for PBXNativeTarget "TOMOpenGLViewTests" */ = {
 			isa = XCConfigurationList;
@@ -476,6 +485,7 @@
 				F1126A3A19BE419200FF3384 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

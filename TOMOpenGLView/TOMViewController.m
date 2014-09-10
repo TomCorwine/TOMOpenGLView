@@ -27,9 +27,8 @@
   TOMOpenGLView *view = [[TOMOpenGLView alloc] initWithFrame:self.view.bounds];
   [self.view addSubview:view];
 
-  view.textureFilename = @"tile_floor";
   view.maximumZoomScale = 2.0;
-  [view startRender];
+  [view setFilename:@"8_Black_Throated_Gray"];
 }
 
 @end
