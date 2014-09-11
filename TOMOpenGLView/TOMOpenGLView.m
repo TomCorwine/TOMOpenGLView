@@ -8,6 +8,7 @@
 
 #import "TOMOpenGLView.h"
 
+#import "8_Black_Throated_Gray.h"
 #import <OpenGLES/EAGL.h>
 
 typedef struct {
@@ -79,6 +80,7 @@ const GLubyte Indices[] = {
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) GLKBaseEffect *effect;
+@property (nonatomic, strong) GLKTextureInfo *texture;
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *dummyView;
@@ -140,8 +142,6 @@ const GLubyte Indices[] = {
 
 - (void)setFilename:(NSString *)filename
 {
-  // TODO: Implement obj
-
   self.effect = [[GLKBaseEffect alloc] init];
 
   NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
@@ -152,15 +152,26 @@ const GLubyte Indices[] = {
   {
     NSLog(@"Error loading file: %@", error.localizedDescription);
   }
-
+  
+  self.texture = info;
+/*
   self.effect.texture2d0.name = info.name;
   self.effect.texture2d0.enabled = true;
+  self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
 
+  self.effect.light0.enabled = GL_TRUE;
+  self.effect.light0.position = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
+  self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
+  self.effect.light0.diffuseColor = GLKVector4Make(0.75f, 0.75f, 0.75f, 1.0f);
+  self.effect.lightingType = GLKLightingTypePerPixel;
+*/
   [self startRender];
 }
 
 - (void)startRender
 {
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+/*
   // New lines
   glGenVertexArraysOES(1, &_vertexArray);
   glBindVertexArrayOES(_vertexArray);
@@ -184,7 +195,7 @@ const GLubyte Indices[] = {
 
   // New line
   glBindVertexArrayOES(0);
-
+*/
   [self setRotation:(TOMOpenGLViewRotation){0.0, 0.0, 0.0} andZoomScale:1.0];
 }
 
@@ -217,12 +228,12 @@ const GLubyte Indices[] = {
 
 - (void)setRotation:(TOMOpenGLViewRotation)rotation andZoomScale:(CGFloat)zoomScale
 {
-  GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0, 0.0, -6.0);
+  GLKMatrix4 modelViewMatrix = GLKMatrix4MakeTranslation(0.0, 0.0, -20.0);
 
   GLfloat xDegrees = rotation.x - (((long)rotation.x / 360) * 360);
   GLfloat yDegrees = rotation.y - (((long)rotation.y / 360) * 360);
 
-  GLfloat yAxisX = yDegrees * ((90.0 - xDegrees) / 90.0);
+  GLfloat yAxisX = yDegrees; // * ((90.0 - xDegrees) / 90.0);
   GLfloat yAxisZ = 0.0;
 
   NSLog(@"xDegrees: %f yAxisX: %f", xDegrees, yAxisX);
@@ -233,7 +244,7 @@ const GLubyte Indices[] = {
   self.effect.transform.modelviewMatrix = modelViewMatrix;
 
   float aspect = fabsf(self.bounds.size.width / self.bounds.size.height);
-  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0 / zoomScale), aspect, 4.0, 10.0);
+  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(105.0 / zoomScale), aspect, 0.0, 100.0);
   self.effect.transform.projectionMatrix = projectionMatrix;
 
   [self display];
@@ -264,13 +275,41 @@ const GLubyte Indices[] = {
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-  glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   [self.effect prepareToDraw];
 
-  glBindVertexArrayOES(_vertexArray);
-  glDrawElements(GL_TRIANGLES, sizeof(Indices) / sizeof(Indices[0]), GL_UNSIGNED_BYTE, 0);
+  //glBindVertexArrayOES(_vertexArray);
+  //glDrawElements(GL_TRIANGLES, sizeof(Indices) / sizeof(Indices[0]), GL_UNSIGNED_BYTE, 0);
+  
+  // Positions
+  glEnableVertexAttribArray(GLKVertexAttribPosition);
+  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, cubePositions);
+  
+  // Normals
+  glEnableVertexAttribArray(GLKVertexAttribNormal);
+  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
+  
+  // Render by parts
+  for(int i=0; i<cubeMaterials; i++)
+  {
+    // Set material
+    //self.effect.material.diffuseColor = GLKVector4Make(cubeDiffuses[i][0], cubeDiffuses[i][1], cubeDiffuses[i][2], 1.0f);
+    //self.effect.material.specularColor = GLKVector4Make(cubeSpeculars[i][0], cubeSpeculars[i][1], cubeSpeculars[i][2], 1.0f);
+    
+    self.effect.texture2d0.name = self.texture.name;
+    self.effect.texture2d0.enabled = true;
+    self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
+    
+    // Prepare effect
+    [self.effect prepareToDraw];
+    
+    // Draw vertices
+    glDrawArrays(GL_TRIANGLES, cubeFirsts[i], cubeCounts[i]);
+    
+    //GL_API void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
+    //GL_API void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei count);
+  }
 }
 
 #pragma mark - UIScrollView Delegates
