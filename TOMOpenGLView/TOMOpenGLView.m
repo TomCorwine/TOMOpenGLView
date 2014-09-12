@@ -8,9 +8,10 @@
 
 #import "TOMOpenGLView.h"
 
-#import "8_Black_Throated_Gray.h"
+#import "Black_Throated_Gray.h"
 #import <OpenGLES/EAGL.h>
 
+/*
 typedef struct {
   float Position[3];
   float Color[4];
@@ -70,6 +71,7 @@ const GLubyte Indices[] = {
   20, 21, 22,
   22, 23, 20
 };
+*/
 
 @interface TOMOpenGLView () <GLKViewDelegate, UIScrollViewDelegate>
 {
@@ -80,7 +82,6 @@ const GLubyte Indices[] = {
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) GLKBaseEffect *effect;
-@property (nonatomic, strong) GLKTextureInfo *texture;
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *dummyView;
@@ -147,24 +148,25 @@ const GLubyte Indices[] = {
   NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
   NSError *error;
   NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
-  GLKTextureInfo *info = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
-  if (nil == info)
+  GLKTextureInfo *textureInfo = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
+  if (nil == textureInfo)
   {
     NSLog(@"Error loading file: %@", error.localizedDescription);
   }
-  
-  self.texture = info;
-/*
-  self.effect.texture2d0.name = info.name;
-  self.effect.texture2d0.enabled = true;
-  self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
 
+  self.effect.texture2d0.name = textureInfo.name;
+  self.effect.texture2d0.enabled = true;
+  //self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
+/*
   self.effect.light0.enabled = GL_TRUE;
   self.effect.light0.position = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
   self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
   self.effect.light0.diffuseColor = GLKVector4Make(0.75f, 0.75f, 0.75f, 1.0f);
   self.effect.lightingType = GLKLightingTypePerPixel;
-*/
+ */
+  //glBindTexture(GL_TEXTURE_2D, textureInfo.name);
+  //glUniform1i(self.phongShader.uTexture, 0);
+
   [self startRender];
 }
 
@@ -284,28 +286,31 @@ const GLubyte Indices[] = {
   
   // Positions
   glEnableVertexAttribArray(GLKVertexAttribPosition);
-  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, cubePositions);
+  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayPositions);
   
   // Normals
   glEnableVertexAttribArray(GLKVertexAttribNormal);
-  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
+  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayNormals);
+
+  //glEnableVertexAttribArray(GLKVertexAttribColor);
+  //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
+
+  // Textures
+  glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
+  glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayTexels);
   
   // Render by parts
-  for(int i=0; i<cubeMaterials; i++)
+  for(int i=0; i<Black_Throated_GrayMaterials; i++)
   {
     // Set material
-    //self.effect.material.diffuseColor = GLKVector4Make(cubeDiffuses[i][0], cubeDiffuses[i][1], cubeDiffuses[i][2], 1.0f);
-    //self.effect.material.specularColor = GLKVector4Make(cubeSpeculars[i][0], cubeSpeculars[i][1], cubeSpeculars[i][2], 1.0f);
-    
-    self.effect.texture2d0.name = self.texture.name;
-    self.effect.texture2d0.enabled = true;
-    self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
+    self.effect.material.diffuseColor = GLKVector4Make(Black_Throated_GrayDiffuses[i][0], Black_Throated_GrayDiffuses[i][1], Black_Throated_GrayDiffuses[i][2], 1.0f);
+    self.effect.material.specularColor = GLKVector4Make(Black_Throated_GraySpeculars[i][0], Black_Throated_GraySpeculars[i][1], Black_Throated_GraySpeculars[i][2], 1.0f);
     
     // Prepare effect
-    [self.effect prepareToDraw];
+    //[self.effect prepareToDraw];
     
     // Draw vertices
-    glDrawArrays(GL_TRIANGLES, cubeFirsts[i], cubeCounts[i]);
+    glDrawArrays(GL_TRIANGLES, Black_Throated_GrayFirsts[i], Black_Throated_GrayCounts[i]);
     
     //GL_API void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
     //GL_API void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei count);
@@ -364,67 +369,4 @@ const GLubyte Indices[] = {
   return self.dummyView;
 }
 
-#pragma mark - File Parsing
-/*
-- (void)loadObjFile:(NSString *)filename vertices:(Vertex *)verticies normals:(void *)normals indices:(GLubyte *)indices
-{
-  NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"obj"];
-  if (nil == path)
-  {
-    NSLog(@"Error loading file path");
-    return;
-  }
-
-  NSError *error;
-  NSString *objString = [[NSString alloc] initWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
-  if (error)
-  {
-    NSLog(@"Error loading file: %@", error.localizedDescription);
-    return;
-  }
-
-  NSArray *objLines = [objString componentsSeparatedByString:@"\n"];
-  for (NSString *objLine in objLines)
-  {
-    if ([objLine hasPrefix:@"v "])
-    {
-      NSString *line = [objLine substringFromIndex:2];
-    }
-    else if ([objLine hasPrefix:@"f "])
-    {
-      NSString *line = [objLine substringFromIndex:2];
-    }
-  }
-}
-//void load_obj(const char* filename, vector<glm::vec4> &vertices, vector<glm::vec3> &normals, vector<GLushort> &elements) {
-//ifstream in(filename, ios::in);
-//if (!in) { cerr << "Cannot open " << filename << endl; exit(1); }
-
-//string line;
-//while (getline(in, line)) {
-//if (line.substr(0,2) == "v ") {
-//istringstream s(line.substr(2));
-      glm::vec4 v; s >> v.x; s >> v.y; s >> v.z; v.w = 1.0f;
-      vertices.push_back(v);
-//}  else if (line.substr(0,2) == "f ") {
-//istringstream s(line.substr(2));
-      GLushort a,b,c;
-      s >> a; s >> b; s >> c;
-      a--; b--; c--;
-      elements.push_back(a); elements.push_back(b); elements.push_back(c);
-//}
-//}
-
-  normals.resize(vertices.size(), glm::vec3(0.0, 0.0, 0.0));
-  for (int i = 0; i < elements.size(); i+=3) {
-    GLushort ia = elements[i];
-    GLushort ib = elements[i+1];
-    GLushort ic = elements[i+2];
-    glm::vec3 normal = glm::normalize(glm::cross(
-                                                 glm::vec3(vertices[ib]) - glm::vec3(vertices[ia]),
-                                                 glm::vec3(vertices[ic]) - glm::vec3(vertices[ia])));
-    normals[ia] = normals[ib] = normals[ic] = normal;
-  }
-}
-*/
 @end
