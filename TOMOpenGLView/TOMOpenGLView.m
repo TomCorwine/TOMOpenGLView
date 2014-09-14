@@ -157,13 +157,13 @@ const GLubyte Indices[] = {
   self.effect.texture2d0.name = textureInfo.name;
   self.effect.texture2d0.enabled = true;
   //self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
-/*
-  self.effect.light0.enabled = GL_TRUE;
-  self.effect.light0.position = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
-  self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
-  self.effect.light0.diffuseColor = GLKVector4Make(0.75f, 0.75f, 0.75f, 1.0f);
-  self.effect.lightingType = GLKLightingTypePerPixel;
- */
+
+  //self.effect.light0.enabled = GL_TRUE;
+  //self.effect.light0.position = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
+  //self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
+  //self.effect.light0.diffuseColor = GLKVector4Make(0.75f, 0.75f, 0.75f, 1.0f);
+  //self.effect.lightingType = GLKLightingTypePerPixel;
+
   //glBindTexture(GL_TEXTURE_2D, textureInfo.name);
   //glUniform1i(self.phongShader.uTexture, 0);
 
@@ -205,8 +205,8 @@ const GLubyte Indices[] = {
 {
   [EAGLContext setCurrentContext:self.context];
 
-  glDeleteBuffers(1, &_vertexBuffer);
-  glDeleteBuffers(1, &_indexBuffer);
+  //glDeleteBuffers(1, &_vertexBuffer);
+  //glDeleteBuffers(1, &_indexBuffer);
   //glDeleteVertexArraysOES(1, &_vertexArray);
 
   if ([[EAGLContext currentContext] isEqual:self.context])
@@ -279,39 +279,39 @@ const GLubyte Indices[] = {
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  [self.effect prepareToDraw];
-
   //glBindVertexArrayOES(_vertexArray);
   //glDrawElements(GL_TRIANGLES, sizeof(Indices) / sizeof(Indices[0]), GL_UNSIGNED_BYTE, 0);
-  
+
   // Positions
   glEnableVertexAttribArray(GLKVertexAttribPosition);
   glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayPositions);
-  
+
   // Normals
-  glEnableVertexAttribArray(GLKVertexAttribNormal);
-  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayNormals);
+  //glEnableVertexAttribArray(GLKVertexAttribNormal);
+  //glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayNormals);
 
   //glEnableVertexAttribArray(GLKVertexAttribColor);
-  //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
+  //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayNormals);
 
   // Textures
   glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
   glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayTexels);
-  
+
+  [self.effect prepareToDraw];
+
   // Render by parts
-  for(int i=0; i<Black_Throated_GrayMaterials; i++)
+  for (int i = 0; i < Black_Throated_GrayMaterials; i++)
   {
     // Set material
-    self.effect.material.diffuseColor = GLKVector4Make(Black_Throated_GrayDiffuses[i][0], Black_Throated_GrayDiffuses[i][1], Black_Throated_GrayDiffuses[i][2], 1.0f);
-    self.effect.material.specularColor = GLKVector4Make(Black_Throated_GraySpeculars[i][0], Black_Throated_GraySpeculars[i][1], Black_Throated_GraySpeculars[i][2], 1.0f);
-    
+    //self.effect.material.diffuseColor = GLKVector4Make(Black_Throated_GrayDiffuses[i][0], Black_Throated_GrayDiffuses[i][1], Black_Throated_GrayDiffuses[i][2], 1.0);
+    //self.effect.material.specularColor = GLKVector4Make(Black_Throated_GraySpeculars[i][0], Black_Throated_GraySpeculars[i][1], Black_Throated_GraySpeculars[i][2], 1.0);
+
     // Prepare effect
     //[self.effect prepareToDraw];
-    
+
     // Draw vertices
     glDrawArrays(GL_TRIANGLES, Black_Throated_GrayFirsts[i], Black_Throated_GrayCounts[i]);
-    
+
     //GL_API void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
     //GL_API void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei count);
   }
