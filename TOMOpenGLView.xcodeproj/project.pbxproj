@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F1096AEC19C8D82A00DDA4B2 /* Black_Throated_Green.c in Sources */ = {isa = PBXBuildFile; fileRef = F1096AE919C8D82A00DDA4B2 /* Black_Throated_Green.c */; };
+		F1096AED19C8D82A00DDA4B2 /* Black_Throated_Green.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F1096AEB19C8D82A00DDA4B2 /* Black_Throated_Green.jpg */; };
 		F1126A0D19BE419200FF3384 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1126A0C19BE419200FF3384 /* Foundation.framework */; };
 		F1126A0F19BE419200FF3384 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1126A0E19BE419200FF3384 /* CoreGraphics.framework */; };
 		F1126A1119BE419200FF3384 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1126A1019BE419200FF3384 /* UIKit.framework */; };
@@ -23,8 +25,6 @@
 		F1126A4C19BE568600FF3384 /* TOMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1126A4719BE515700FF3384 /* TOMViewController.m */; };
 		F1126A4D19BE568A00FF3384 /* TOMOpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1126A3C19BE41D100FF3384 /* TOMOpenGLView.m */; };
 		F1126A4F19BE59AE00FF3384 /* new_york_skyline.png in Resources */ = {isa = PBXBuildFile; fileRef = F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */; };
-		F1608F1719C2884E00C2534C /* Black_Throated_Gray.c in Sources */ = {isa = PBXBuildFile; fileRef = F1608F1419C2884E00C2534C /* Black_Throated_Gray.c */; };
-		F1608F1819C2884E00C2534C /* Black_Throated_Gray.jpg in Resources */ = {isa = PBXBuildFile; fileRef = F1608F1619C2884E00C2534C /* Black_Throated_Gray.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +38,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		F1096AE919C8D82A00DDA4B2 /* Black_Throated_Green.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Black_Throated_Green.c; sourceTree = "<group>"; };
+		F1096AEA19C8D82A00DDA4B2 /* Black_Throated_Green.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Black_Throated_Green.h; sourceTree = "<group>"; };
+		F1096AEB19C8D82A00DDA4B2 /* Black_Throated_Green.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Black_Throated_Green.jpg; sourceTree = "<group>"; };
 		F1126A0919BE419200FF3384 /* TOMOpenGLView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TOMOpenGLView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1126A0C19BE419200FF3384 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		F1126A0E19BE419200FF3384 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -60,9 +63,6 @@
 		F1126A4619BE515700FF3384 /* TOMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TOMViewController.h; sourceTree = "<group>"; };
 		F1126A4719BE515700FF3384 /* TOMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TOMViewController.m; sourceTree = "<group>"; };
 		F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = new_york_skyline.png; sourceTree = "<group>"; };
-		F1608F1419C2884E00C2534C /* Black_Throated_Gray.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Black_Throated_Gray.c; sourceTree = "<group>"; };
-		F1608F1519C2884E00C2534C /* Black_Throated_Gray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Black_Throated_Gray.h; sourceTree = "<group>"; };
-		F1608F1619C2884E00C2534C /* Black_Throated_Gray.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = Black_Throated_Gray.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,9 +126,9 @@
 		F1126A1219BE419200FF3384 /* TOMOpenGLView */ = {
 			isa = PBXGroup;
 			children = (
-				F1608F1519C2884E00C2534C /* Black_Throated_Gray.h */,
-				F1608F1419C2884E00C2534C /* Black_Throated_Gray.c */,
-				F1608F1619C2884E00C2534C /* Black_Throated_Gray.jpg */,
+				F1096AE919C8D82A00DDA4B2 /* Black_Throated_Green.c */,
+				F1096AEA19C8D82A00DDA4B2 /* Black_Throated_Green.h */,
+				F1096AEB19C8D82A00DDA4B2 /* Black_Throated_Green.jpg */,
 				F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */,
 				F1126A1B19BE419200FF3384 /* TOMAppDelegate.h */,
 				F1126A1C19BE419200FF3384 /* TOMAppDelegate.m */,
@@ -248,7 +248,7 @@
 			files = (
 				F1126A1F19BE419200FF3384 /* Images.xcassets in Resources */,
 				F1126A4F19BE59AE00FF3384 /* new_york_skyline.png in Resources */,
-				F1608F1819C2884E00C2534C /* Black_Throated_Gray.jpg in Resources */,
+				F1096AED19C8D82A00DDA4B2 /* Black_Throated_Green.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,8 +267,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1096AEC19C8D82A00DDA4B2 /* Black_Throated_Green.c in Sources */,
 				F1126A1919BE419200FF3384 /* main.m in Sources */,
-				F1608F1719C2884E00C2534C /* Black_Throated_Gray.c in Sources */,
 				F1126A4C19BE568600FF3384 /* TOMViewController.m in Sources */,
 				F1126A4D19BE568A00FF3384 /* TOMOpenGLView.m in Sources */,
 				F1126A1D19BE419200FF3384 /* TOMAppDelegate.m in Sources */,

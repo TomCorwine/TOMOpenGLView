@@ -8,77 +8,10 @@
 
 #import "TOMOpenGLView.h"
 
-#import "Black_Throated_Gray.h"
+#import "Black_Throated_Green.h"
 #import <OpenGLES/EAGL.h>
 
-/*
-typedef struct {
-  float Position[3];
-  float Color[4];
-  float TexCoord[2];
-} Vertex;
-
-const Vertex Vertices[] = {
-  // Front
-  {{1, -1, 1}, {1, 1, 1, 1}, {1, 0}},
-  {{1, 1, 1}, {1, 1, 1, 1}, {1, 1}},
-  {{-1, 1, 1}, {1, 1, 1, 1}, {0, 1}},
-  {{-1, -1, 1}, {1, 1, 1, 1}, {0, 0}},
-  // Back
-  {{1, 1, -1}, {1, 1, 1, 1}, {0, 1}},
-  {{-1, -1, -1}, {1, 1, 1, 1}, {1, 0}},
-  {{1, -1, -1}, {1, 1, 1, 1}, {0, 0}},
-  {{-1, 1, -1}, {1, 1, 1, 1}, {1, 1}},
-  // Left
-  {{-1, -1, 1}, {1, 1, 1, 1}, {1, 0}},
-  {{-1, 1, 1}, {1, 1, 1, 1}, {1, 1}},
-  {{-1, 1, -1}, {1, 1, 1, 1}, {0, 1}},
-  {{-1, -1, -1}, {1, 1, 1, 1}, {0, 0}},
-  // Right
-  {{1, -1, -1}, {1, 1, 1, 1}, {1, 0}},
-  {{1, 1, -1}, {1, 1, 1, 1}, {1, 1}},
-  {{1, 1, 1}, {1, 1, 1, 1}, {0, 1}},
-  {{1, -1, 1}, {1, 1, 1, 1}, {0, 0}},
-  // Top
-  {{1, 1, 1}, {1, 1, 1, 1}, {1, 0}},
-  {{1, 1, -1}, {1, 1, 1, 1}, {1, 1}},
-  {{-1, 1, -1}, {1, 1, 1, 1}, {0, 1}},
-  {{-1, 1, 1}, {1, 1, 1, 1}, {0, 0}},
-  // Bottom
-  {{1, -1, -1}, {1, 1, 1, 1}, {1, 0}},
-  {{1, -1, 1}, {1, 1, 1, 1}, {1, 1}},
-  {{-1, -1, 1}, {1, 1, 1, 1}, {0, 1}},
-  {{-1, -1, -1}, {1, 1, 1, 1}, {0, 0}}
-};
-
-const GLubyte Indices[] = {
-  // Front
-  0, 1, 2,
-  2, 3, 0,
-  // Back
-  4, 6, 5,
-  4, 5, 7,
-  // Left
-  8, 9, 10,
-  10, 11, 8,
-  // Right
-  12, 13, 14,
-  14, 15, 12,
-  // Top
-  16, 17, 18,
-  18, 19, 16,
-  // Bottom
-  20, 21, 22,
-  22, 23, 20
-};
-*/
-
 @interface TOMOpenGLView () <GLKViewDelegate, UIScrollViewDelegate>
-{
-  GLuint _vertexBuffer;
-  GLuint _indexBuffer;
-  GLuint _vertexArray;
-}
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) GLKBaseEffect *effect;
@@ -112,7 +45,7 @@ const GLubyte Indices[] = {
   scrollView.pagingEnabled = NO;
   [self addSubview:scrollView];
 
-  self.dummyView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, scrollView.contentSize.width, scrollView.contentSize.height)];
+  self.dummyView = [[UIView alloc] initWithFrame:scrollView.bounds];
   [scrollView addSubview:self.dummyView];
 
   self.scrollView = scrollView;
@@ -127,18 +60,17 @@ const GLubyte Indices[] = {
 
   self.delegate = self;
 
+  [EAGLContext setCurrentContext:self.context];
   self.context = self.context;
-  self.drawableMultisample = GLKViewDrawableMultisample4X;
-
-  [self setupOpenGL];
+  //self.drawableMultisample = GLKViewDrawableMultisample4X;
+  glEnable(GL_CULL_FACE);
+  //glDisable(GL_CULL_FACE);
+  //glCullFace(GL_FRONT);
+  //glCullFace(GL_BACK);
+  //glFrontFace(GL_CW);
+  //glFrontFace(GL_CCW);
 
   return self;
-}
-
-- (void)setupOpenGL
-{
-  [EAGLContext setCurrentContext:self.context];
-  glEnable(GL_CULL_FACE);
 }
 
 - (void)setFilename:(NSString *)filename
@@ -154,18 +86,18 @@ const GLubyte Indices[] = {
     NSLog(@"Error loading file: %@", error.localizedDescription);
   }
 
-  self.effect.texture2d0.name = textureInfo.name;
-  self.effect.texture2d0.enabled = true;
+  //self.effect.texture2d0.name = textureInfo.name;
+  //self.effect.texture2d0.enabled = GL_TRUE;
   //self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
-
-  //self.effect.light0.enabled = GL_TRUE;
-  //self.effect.light0.position = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
-  //self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
-  //self.effect.light0.diffuseColor = GLKVector4Make(0.75f, 0.75f, 0.75f, 1.0f);
-  //self.effect.lightingType = GLKLightingTypePerPixel;
 
   //glBindTexture(GL_TEXTURE_2D, textureInfo.name);
   //glUniform1i(self.phongShader.uTexture, 0);
+
+  self.effect.light0.enabled = GL_TRUE;
+  self.effect.light0.position = GLKVector4Make(0.0f, 0.0f, 0.0f, 1.0f);
+  self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
+  self.effect.light0.diffuseColor = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
+  self.effect.lightingType = GLKLightingTypePerPixel;
 
   [self startRender];
 }
@@ -173,42 +105,13 @@ const GLubyte Indices[] = {
 - (void)startRender
 {
   glClearColor(0.0, 0.0, 0.0, 0.0);
-/*
-  // New lines
-  glGenVertexArraysOES(1, &_vertexArray);
-  glBindVertexArrayOES(_vertexArray);
 
-  // Old stuff
-  glGenBuffers(1, &_vertexBuffer);
-  glBindBuffer(GL_ARRAY_BUFFER, _vertexBuffer);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-
-  glGenBuffers(1, &_indexBuffer);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexBuffer);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
-
-  // New lines (were previously in draw)
-  glEnableVertexAttribArray(GLKVertexAttribPosition);
-  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, Position));
-  glEnableVertexAttribArray(GLKVertexAttribColor);
-  glVertexAttribPointer(GLKVertexAttribColor, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, Color));
-  glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
-  glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)offsetof(Vertex, TexCoord));
-
-  // New line
-  glBindVertexArrayOES(0);
-*/
   [self setRotation:(TOMOpenGLViewRotation){0.0, 0.0, 0.0} andZoomScale:1.0];
 }
 
 - (void)stopRender
 {
   [EAGLContext setCurrentContext:self.context];
-
-  //glDeleteBuffers(1, &_vertexBuffer);
-  //glDeleteBuffers(1, &_indexBuffer);
-  //glDeleteVertexArraysOES(1, &_vertexArray);
-
   if ([[EAGLContext currentContext] isEqual:self.context])
   {
     [EAGLContext setCurrentContext:nil];
@@ -246,7 +149,7 @@ const GLubyte Indices[] = {
   self.effect.transform.modelviewMatrix = modelViewMatrix;
 
   float aspect = fabsf(self.bounds.size.width / self.bounds.size.height);
-  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(105.0 / zoomScale), aspect, 0.0, 100.0);
+  GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(120.0 / zoomScale), aspect, 0.0, 100.0);
   self.effect.transform.projectionMatrix = projectionMatrix;
 
   [self display];
@@ -279,41 +182,33 @@ const GLubyte Indices[] = {
 {
   glClear(GL_COLOR_BUFFER_BIT);
 
-  //glBindVertexArrayOES(_vertexArray);
-  //glDrawElements(GL_TRIANGLES, sizeof(Indices) / sizeof(Indices[0]), GL_UNSIGNED_BYTE, 0);
-
   // Positions
   glEnableVertexAttribArray(GLKVertexAttribPosition);
-  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayPositions);
+  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, objPositions);
 
   // Normals
-  //glEnableVertexAttribArray(GLKVertexAttribNormal);
-  //glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayNormals);
+  glEnableVertexAttribArray(GLKVertexAttribNormal);
+  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, objNormals);
 
   //glEnableVertexAttribArray(GLKVertexAttribColor);
-  //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayNormals);
+  //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
 
   // Textures
   glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
-  glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, Black_Throated_GrayTexels);
-
-  [self.effect prepareToDraw];
+  glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, objTexels);
 
   // Render by parts
-  for (int i = 0; i < Black_Throated_GrayMaterials; i++)
+  for(int i = 0; i < objMaterials; i++)
   {
     // Set material
-    //self.effect.material.diffuseColor = GLKVector4Make(Black_Throated_GrayDiffuses[i][0], Black_Throated_GrayDiffuses[i][1], Black_Throated_GrayDiffuses[i][2], 1.0);
-    //self.effect.material.specularColor = GLKVector4Make(Black_Throated_GraySpeculars[i][0], Black_Throated_GraySpeculars[i][1], Black_Throated_GraySpeculars[i][2], 1.0);
+    self.effect.material.diffuseColor = GLKVector4Make(objDiffuses[i][0], objDiffuses[i][1], objDiffuses[i][2], 1.0f);
+    self.effect.material.specularColor = GLKVector4Make(objSpeculars[i][0], objSpeculars[i][1], objSpeculars[i][2], 1.0f);
 
     // Prepare effect
-    //[self.effect prepareToDraw];
+    [self.effect prepareToDraw];
 
     // Draw vertices
-    glDrawArrays(GL_TRIANGLES, Black_Throated_GrayFirsts[i], Black_Throated_GrayCounts[i]);
-
-    //GL_API void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-    //GL_API void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei count);
+    glDrawArrays(GL_TRIANGLES, objFirsts[i], objCounts[i]);
   }
 }
 
