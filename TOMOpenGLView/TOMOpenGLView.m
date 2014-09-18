@@ -61,27 +61,10 @@
   self.delegate = self;
 
   [EAGLContext setCurrentContext:self.context];
-  //self.drawableMultisample = GLKViewDrawableMultisample4X;
-  //self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
+
+  self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
   glEnable(GL_CULL_FACE);
   glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LEQUAL);
-  /*
-   #define GL_NEVER                          0x0200
-   #define GL_LESS                           0x0201
-   #define GL_EQUAL                          0x0202
-   #define GL_LEQUAL                         0x0203
-   #define GL_GREATER                        0x0204
-   #define GL_NOTEQUAL                       0x0205
-   #define GL_GEQUAL                         0x0206
-   #define GL_ALWAYS                         0x0207
-   */
-  //glDisable(GL_CULL_FACE);
-  //glCullFace(GL_FRONT);
-  glCullFace(GL_BACK);
-  //glFrontFace(GL_CW);
-  //glFrontFace(GL_CCW);
-  //glFrontFace(GL_FRONT_AND_BACK);
 
   return self;
 }
@@ -92,26 +75,6 @@
   
   self.effect = [[GLKBaseEffect alloc] init];
   self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
-  
-  //glBindTexture(self.textureInfo.target, self.textureInfo.name);
-  //const GLuint blah = self.textureInfo.name;
-  //glDeleteTextures(1, &blah);
-  //glEnable(self.textureInfo.target);
-  
-  //glBindTexture(GL_TEXTURE_2D, self.textureInfo.name);
-  //glUniform1i(self.phongShader.uTexture, 0);
-  
-  //GLuint depthRenderbuffer;
-  //glGenRenderbuffersOES(1, &depthRenderbuffer);
-	//glBindRenderbufferOES(GL_RENDERBUFFER_OES, depthRenderbuffer);
-	//glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, self.bounds.size.width, self.bounds.size.height);
-	//glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depthRenderbuffer);
-  
-  self.effect.light0.enabled = GL_TRUE;
-  self.effect.light0.position = GLKVector4Make(0.0f, 0.0f, 0.0f, 1.0f);
-  self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
-  self.effect.light0.diffuseColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 0.25f);
-  self.effect.lightingType = GLKLightingTypePerPixel;
 
   [self setRotation:(TOMOpenGLViewRotation){0.0, 0.0, 0.0} andZoomScale:1.0];
 }
@@ -224,7 +187,7 @@
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Positions
   glEnableVertexAttribArray(GLKVertexAttribPosition);
@@ -245,8 +208,8 @@
   for (int i = 0; i < objMaterials; i++)
   {
     // Set material
-    //self.effect.material.diffuseColor = GLKVector4Make(objDiffuses[i][0], objDiffuses[i][1], objDiffuses[i][2], 1.0f);
-    //self.effect.material.specularColor = GLKVector4Make(objSpeculars[i][0], objSpeculars[i][1], objSpeculars[i][2], 1.0f);
+    self.effect.material.diffuseColor = GLKVector4Make(objDiffuses[i][0], objDiffuses[i][1], objDiffuses[i][2], 1.0f);
+    self.effect.material.specularColor = GLKVector4Make(objSpeculars[i][0], objSpeculars[i][1], objSpeculars[i][2], 1.0f);
 
     NSString *filename = [NSString stringWithUTF8String:objTextures[i]];
     GLKTextureInfo *textureInfo = [self textureForFilename:filename];
