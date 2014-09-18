@@ -15,7 +15,6 @@
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) GLKBaseEffect *effect;
-@property (nonatomic, strong) GLKTextureInfo *textureInfo;
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *dummyView;
@@ -62,7 +61,6 @@
   self.delegate = self;
 
   [EAGLContext setCurrentContext:self.context];
-  self.context = self.context;
   //self.drawableMultisample = GLKViewDrawableMultisample4X;
   //self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
   glEnable(GL_CULL_FACE);
@@ -88,49 +86,32 @@
   return self;
 }
 
-- (void)setFilename:(NSString *)filename
+- (void)startRender
 {
+  glClearColor(0.0, 0.0, 0.0, 0.0);
+  
   self.effect = [[GLKBaseEffect alloc] init];
-
-  NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
-  NSError *error;
-  NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
-  self.textureInfo = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
-  if (nil == self.textureInfo)
-  {
-    NSLog(@"Error loading file: %@", error.localizedDescription);
-  }
-
-  self.effect.texture2d0.name = self.textureInfo.name;
-  self.effect.texture2d0.enabled = GL_TRUE;
   self.effect.texture2d0.envMode = GLKTextureEnvModeReplace;
-
+  
   //glBindTexture(self.textureInfo.target, self.textureInfo.name);
   //const GLuint blah = self.textureInfo.name;
   //glDeleteTextures(1, &blah);
   //glEnable(self.textureInfo.target);
-
+  
   //glBindTexture(GL_TEXTURE_2D, self.textureInfo.name);
   //glUniform1i(self.phongShader.uTexture, 0);
-
+  
   //GLuint depthRenderbuffer;
   //glGenRenderbuffersOES(1, &depthRenderbuffer);
 	//glBindRenderbufferOES(GL_RENDERBUFFER_OES, depthRenderbuffer);
 	//glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, self.bounds.size.width, self.bounds.size.height);
 	//glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, depthRenderbuffer);
-
+  
   self.effect.light0.enabled = GL_TRUE;
   self.effect.light0.position = GLKVector4Make(0.0f, 0.0f, 0.0f, 1.0f);
   self.effect.light0.specularColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 1.0f);
-  self.effect.light0.diffuseColor = GLKVector4Make(1.0f, 1.0f, 1.0f, 1.0f);
+  self.effect.light0.diffuseColor = GLKVector4Make(0.25f, 0.25f, 0.25f, 0.25f);
   self.effect.lightingType = GLKLightingTypePerPixel;
-
-  [self startRender];
-}
-
-- (void)startRender
-{
-  glClearColor(0.0, 0.0, 0.0, 0.0);
 
   [self setRotation:(TOMOpenGLViewRotation){0.0, 0.0, 0.0} andZoomScale:1.0];
 }
@@ -164,14 +145,16 @@
   GLfloat xDegrees = rotation.x - (((long)rotation.x / 360) * 360);
   GLfloat yDegrees = rotation.y - (((long)rotation.y / 360) * 360);
 
-  GLfloat yAxisX = yDegrees; // * ((90.0 - xDegrees) / 90.0);
-  GLfloat yAxisZ = 0.0;
+  //GLfloat yAxisX = yDegrees; // * ((90.0 - xDegrees) / 90.0);
+  //GLfloat yAxisZ = 0.0;
 
-  NSLog(@"xDegrees: %f yAxisX: %f", xDegrees, yAxisX);
+  //NSLog(@"xDegrees: %f yAxisX: %f", xDegrees, yAxisX);
 
-  modelViewMatrix = GLKMatrix4RotateX(modelViewMatrix, GLKMathDegreesToRadians(yAxisX));
   modelViewMatrix = GLKMatrix4RotateY(modelViewMatrix, GLKMathDegreesToRadians(xDegrees));
-  modelViewMatrix = GLKMatrix4RotateZ(modelViewMatrix, GLKMathDegreesToRadians(yAxisZ));
+  modelViewMatrix = GLKMatrix4RotateX(modelViewMatrix, GLKMathDegreesToRadians(yDegrees));
+  //modelViewMatrix = GLKMatrix4RotateX(modelViewMatrix, GLKMathDegreesToRadians(yAxisX));
+  //modelViewMatrix = GLKMatrix4RotateY(modelViewMatrix, GLKMathDegreesToRadians(xDegrees));
+  //modelViewMatrix = GLKMatrix4RotateZ(modelViewMatrix, GLKMathDegreesToRadians(yAxisZ));
   self.effect.transform.modelviewMatrix = modelViewMatrix;
 
   float aspect = fabsf(self.bounds.size.width / self.bounds.size.height);
@@ -202,6 +185,41 @@
   self.scrollView.maximumZoomScale = self.maximumZoomScale;
 }
 
+#pragma mark - Accessors
+
+- (GLKTextureInfo *)textureForFilename:(NSString *)filename
+{
+  if (0 == filename.length)
+  {
+    return nil;
+  }
+
+  static NSMutableDictionary *textureDictionary;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    textureDictionary = @{}.mutableCopy;
+  });
+  
+  GLKTextureInfo *textureInfo = textureDictionary[filename];
+  if (nil == textureInfo)
+  {
+    NSError *error;
+    NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
+    NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+    textureInfo = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
+    if (textureInfo && nil == error)
+    {
+      textureDictionary[filename] = textureInfo;
+    }
+    else
+    {
+      NSLog(@"Error loading file: %@", error.localizedDescription);
+    }
+  }
+  
+  return textureInfo;
+}
+
 #pragma mark - GLKView Delegate
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -213,8 +231,8 @@
   glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, objPositions);
 
   // Normals
-  //glEnableVertexAttribArray(GLKVertexAttribNormal);
-  //glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, objNormals);
+  glEnableVertexAttribArray(GLKVertexAttribNormal);
+  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, objNormals);
 
   //glEnableVertexAttribArray(GLKVertexAttribColor);
   //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
@@ -225,13 +243,15 @@
 
   // Render by parts
   for (int i = 0; i < objMaterials; i++)
-  //for (int i = 2; i < 3; i++)
   {
     // Set material
-    self.effect.material.diffuseColor = GLKVector4Make(objDiffuses[i][0], objDiffuses[i][1], objDiffuses[i][2], 1.0f);
-    self.effect.material.specularColor = GLKVector4Make(objSpeculars[i][0], objSpeculars[i][1], objSpeculars[i][2], 1.0f);
+    //self.effect.material.diffuseColor = GLKVector4Make(objDiffuses[i][0], objDiffuses[i][1], objDiffuses[i][2], 1.0f);
+    //self.effect.material.specularColor = GLKVector4Make(objSpeculars[i][0], objSpeculars[i][1], objSpeculars[i][2], 1.0f);
 
-    self.effect.texture2d0.enabled = (i == 0 ? GL_TRUE : GL_FALSE);
+    NSString *filename = [NSString stringWithUTF8String:objTextures[i]];
+    GLKTextureInfo *textureInfo = [self textureForFilename:filename];
+    self.effect.texture2d0.name = textureInfo.name;
+
     [self.effect prepareToDraw];
 
     // Draw vertices
@@ -250,7 +270,6 @@
 
   if (self.shouldInhibitRotation)
   {
-    self.inhibitRotation = NO;
     return;
   }
 
@@ -273,6 +292,7 @@
 {
   self.inhibitRotation = YES;
   scrollView.contentOffset = CGPointMake(scrollView.contentSize.width / 2.0, scrollView.contentSize.height / 2.0);
+  self.inhibitRotation = NO;
 }
 
 - (void)scrollViewDidZoom:(UIScrollView *)scrollView

@@ -28,7 +28,7 @@
   [self.view addSubview:view];
 
   view.maximumZoomScale = 2.0;
-  [view setFilename:@"Black_Throated_Green"];
+  [view startRender];
 }
 
 @end

@@ -28,6 +28,6 @@ typedef struct {
 @property (nonatomic) TOMOpenGLViewRotation rotation;
 @property (nonatomic) CGFloat zoomScale; // Range: 1.0 to self.zoomScale. Does nothing if self.zoomScale == 1.0
 
-- (void)setFilename:(NSString *)objFilename;
+- (void)startRender;
 
 @end
