@@ -8,7 +8,7 @@
 
 #import "TOMOpenGLView.h"
 
-#import "Black_Throated_Green.h"
+#import "TOMObjImporter.h"
 #import <OpenGLES/EAGL.h>
 
 @interface TOMOpenGLView () <GLKViewDelegate, UIScrollViewDelegate>
@@ -67,6 +67,18 @@
   glEnable(GL_DEPTH_TEST);
 
   return self;
+}
+
+- (void)renderWithObjFilename:(NSString *)objFilename
+{
+  NSError *error = [TOMObjImporter importObjFilename:objFilename];
+  if (error)
+  {
+    NSLog(@"Error: %@ - %@", error, error.localizedDescription);
+    return;
+  }
+
+  [self startRender];
 }
 
 - (void)startRender
@@ -191,34 +203,34 @@
 
   // Positions
   glEnableVertexAttribArray(GLKVertexAttribPosition);
-  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, objPositions);
+  glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, model.positions);
 
   // Normals
   glEnableVertexAttribArray(GLKVertexAttribNormal);
-  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, objNormals);
+  glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, model.normals);
 
   //glEnableVertexAttribArray(GLKVertexAttribColor);
   //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
 
   // Textures
   glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
-  glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, objTexels);
+  glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, model.texels);
 
   // Render by parts
-  for (int i = 0; i < objMaterials; i++)
+  for (int i = 0; i < model.materials; i++)
   {
     // Set material
-    self.effect.material.diffuseColor = GLKVector4Make(objDiffuses[i][0], objDiffuses[i][1], objDiffuses[i][2], 1.0f);
-    self.effect.material.specularColor = GLKVector4Make(objSpeculars[i][0], objSpeculars[i][1], objSpeculars[i][2], 1.0f);
+    self.effect.material.diffuseColor = GLKVector4Make(model.diffuses[i][0], model.diffuses[i][1], model.diffuses[i][2], 1.0f);
+    self.effect.material.specularColor = GLKVector4Make(model.speculars[i][0], model.speculars[i][1], model.speculars[i][2], 1.0f);
 
-    NSString *filename = [NSString stringWithUTF8String:objTextures[i]];
+    NSString *filename = [NSString stringWithUTF8String:model.textures[i]];
     GLKTextureInfo *textureInfo = [self textureForFilename:filename];
     self.effect.texture2d0.name = textureInfo.name;
 
     [self.effect prepareToDraw];
 
     // Draw vertices
-    glDrawArrays(GL_TRIANGLES, objFirsts[i], objCounts[i]);
+    glDrawArrays(GL_TRIANGLES, model.firsts[i], model.counts[i]);
   }
 }
 
