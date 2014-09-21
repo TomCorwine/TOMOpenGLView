@@ -180,7 +180,14 @@
   {
     NSError *error;
     NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
+    filename = [filename stringByReplacingOccurrencesOfString:@".jpg" withString:@""];
     NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+    if (nil == path)
+    {
+      NSLog(@"Error locating file");
+      return nil;
+    }
+
     textureInfo = [GLKTextureLoader textureWithContentsOfFile:path options:options error:&error];
     if (textureInfo && nil == error)
     {
@@ -200,6 +207,8 @@
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  
+  TOMModel model = objectModel();
 
   // Positions
   glEnableVertexAttribArray(GLKVertexAttribPosition);

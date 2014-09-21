@@ -10,21 +10,20 @@
 
 typedef struct {
   int vertices;
-  float positions[0][3];
-  float texels[0][2];
-  float normals[0][9];
-  int firsts[0];
-  int counts[0];
+  float positions[133704];
+  float texels[89136];
+  float normals[133704];
+  int firsts[3];
+  int counts[3];
   int materials;
-  char textures[0][128];
-  float diffuses[0][3];
-  float speculars[0][3];
+  char textures[3][128];
+  float diffuses[3][3];
+  float speculars[3][3];
 } TOMModel;
-
-static TOMModel model;
 
 @interface TOMObjImporter : NSObject
 
+TOMModel objectModel();
 + (NSError *)importObjFilename:(NSString *)filename;
 
 @end
