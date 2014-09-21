@@ -28,7 +28,7 @@
   [self.view addSubview:view];
 
   view.maximumZoomScale = 2.0;
-  [view renderWithObjFilename:@"Black_Throated_Green"];
+  [view renderWithObjFilename:@"6_Black_Throated_Green"];
 }
 
 @end

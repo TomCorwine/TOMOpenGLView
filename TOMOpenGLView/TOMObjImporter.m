@@ -25,8 +25,6 @@ TOMModel objectModel()
   NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"obj"];
   NSString *objString = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
 
-  //model = (TOMModel){0};
-
   if (nil == error)
   {
     error = [self extractOBJdata:objString];
@@ -269,37 +267,6 @@ TOMModel objectModel()
 
     model.counts[i] = counts[i];
   }
-  
-  NSMutableString *debugString = @"".mutableCopy;
-  
-  [debugString stringByAppendingString:@"// This is a .c file for the model: Black_Throated_Green\n\n#include  \"Black_Throated_Green.h\"\n\n"];
-
-  [debugString appendString:[NSString stringWithFormat:@"const int objVertices = %d;\n\n", model.vertices]];
-  
-  [debugString appendString:[NSString stringWithFormat:@"const float objPositions[%d] = \n{\n", verticiesIndex]];
-  for (int i = 0; i < verticiesIndex / 3; i++)
-  {
-    [debugString appendString:[NSString stringWithFormat:@"%f, %f, %f,\n", model.positions[i], model.positions[i + 1], model.positions[i + 2]]];
-  }
-  [debugString appendString:@"};\n"];
-  
-  [debugString appendString:[NSString stringWithFormat:@"\nconst float objTexels[%d] = \n{\n", texelsIndex]];
-  for (int i = 0; i < texelsIndex / 2; i++)
-  {
-    [debugString appendString:[NSString stringWithFormat:@"%f, %f\n", model.texels[i], model.texels[i + 1]]];
-  }
-  [debugString appendString:@"};\n"];
-  
-  [debugString appendString:[NSString stringWithFormat:@"\nconst float objNormals[%d] = \n{", normalsIndex]];
-  for (int i = 0; i < normalsIndex / 3; i++)
-  {
-    [debugString appendString:[NSString stringWithFormat:@"%f, %f, %f,\n", model.normals[i], model.normals[i + 1], model.normals[i + 2]]];
-  }
-  [debugString appendString:@"};\n"];
-
-  //NSString *urlString = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)[0];
-  //[debugString writeToFile:[urlString stringByAppendingString:@"/blah.txt"] atomically:YES encoding:NSUTF8StringEncoding error:nil];
-  [debugString writeToFile:@"/Users/tcorwine/Desktop/blah.txt" atomically:YES encoding:NSUTF8StringEncoding error:nil];
 
   return nil;
 }
