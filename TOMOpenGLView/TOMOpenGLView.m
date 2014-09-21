@@ -15,6 +15,7 @@
 
 @property (nonatomic, strong) EAGLContext *context;
 @property (nonatomic, strong) GLKBaseEffect *effect;
+@property (nonatomic) TOMModel model;
 
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UIView *dummyView;
@@ -71,14 +72,17 @@
 
 - (void)renderWithObjFilename:(NSString *)objFilename
 {
-  NSError *error = [TOMObjImporter importObjFilename:objFilename];
-  if (error)
-  {
-    NSLog(@"Error: %@ - %@", error, error.localizedDescription);
-    return;
-  }
-
-  [self startRender];
+  [TOMObjImporter importObjFilename:objFilename completionBlock:^(TOMModel model, NSError *error) {
+    if (error)
+    {
+      NSLog(@"Error: %@ - %@", error, error.localizedDescription);
+    }
+    else
+    {
+      self.model = model;
+      [self startRender];
+    }
+  }];
 }
 
 - (void)startRender
@@ -184,7 +188,7 @@
     NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
     if (nil == path)
     {
-      NSLog(@"Error locating file");
+      NSLog(@"Error locating texture file: %@", path);
       return nil;
     }
 
@@ -207,38 +211,29 @@
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-  TOMModel model = objectModel();
 
-  // Positions
+  TOMModel model = self.model;
+
   glEnableVertexAttribArray(GLKVertexAttribPosition);
   glVertexAttribPointer(GLKVertexAttribPosition, 3, GL_FLOAT, GL_FALSE, 0, model.positions);
 
-  // Normals
   glEnableVertexAttribArray(GLKVertexAttribNormal);
   glVertexAttribPointer(GLKVertexAttribNormal, 3, GL_FLOAT, GL_FALSE, 0, model.normals);
 
-  //glEnableVertexAttribArray(GLKVertexAttribColor);
-  //glVertexAttribPointer(GLKVertexAttribColor, 3, GL_FLOAT, GL_FALSE, 0, cubeNormals);
-
-  // Textures
   glEnableVertexAttribArray(GLKVertexAttribTexCoord0);
   glVertexAttribPointer(GLKVertexAttribTexCoord0, 2, GL_FLOAT, GL_FALSE, 0, model.texels);
 
   // Render by parts
   for (int i = 0; i < model.materials; i++)
   {
-    // Set material
     self.effect.material.diffuseColor = GLKVector4Make(model.diffuses[i][0], model.diffuses[i][1], model.diffuses[i][2], 1.0f);
     self.effect.material.specularColor = GLKVector4Make(model.speculars[i][0], model.speculars[i][1], model.speculars[i][2], 1.0f);
 
     NSString *filename = [NSString stringWithUTF8String:model.textures[i]];
     GLKTextureInfo *textureInfo = [self textureForFilename:filename];
     self.effect.texture2d0.name = textureInfo.name;
-
     [self.effect prepareToDraw];
 
-    // Draw vertices
     glDrawArrays(GL_TRIANGLES, model.firsts[i], model.counts[i]);
   }
 }

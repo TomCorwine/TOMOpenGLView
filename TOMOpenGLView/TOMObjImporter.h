@@ -21,9 +21,10 @@ typedef struct {
   float speculars[3][3];
 } TOMModel;
 
+typedef void (^TOMObjImporterCompletionBlock)(TOMModel model, NSError *error);
+
 @interface TOMObjImporter : NSObject
 
-TOMModel objectModel();
-+ (NSError *)importObjFilename:(NSString *)filename;
++ (void)importObjFilename:(NSString *)filename completionBlock:(TOMObjImporterCompletionBlock)completionBlock;
 
 @end

@@ -132,9 +132,9 @@
 			children = (
 				F1EDBD9319CE63E200B8EF0E /* 6_Black_Throated_Green.mtl */,
 				F1EDBD9419CE63E200B8EF0E /* 6_Black_Throated_Green.obj */,
+				F1C8FDF719C9F8F000113BB3 /* 6_Black_Throated_Green.jpg */,
 				F1EDBD9119CE29DC00B8EF0E /* TOMObjImporter.h */,
 				F1EDBD9019CE29DC00B8EF0E /* TOMObjImporter.m */,
-				F1C8FDF719C9F8F000113BB3 /* 6_Black_Throated_Green.jpg */,
 				F1126A4E19BE59AE00FF3384 /* new_york_skyline.png */,
 				F1126A1B19BE419200FF3384 /* TOMAppDelegate.h */,
 				F1126A1C19BE419200FF3384 /* TOMAppDelegate.m */,

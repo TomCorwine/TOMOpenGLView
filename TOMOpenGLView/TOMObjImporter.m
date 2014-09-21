@@ -13,9 +13,13 @@ static NSMutableArray *materialNames;
 
 @implementation TOMObjImporter
 
-TOMModel objectModel()
++ (void)importObjFilename:(NSString *)filename completionBlock:(TOMObjImporterCompletionBlock)completionBlock
 {
-  return model;
+  NSError *error = [self importObjFilename:filename];
+  if (completionBlock)
+  {
+    completionBlock(model, error);
+  }
 }
 
 + (NSError *)importObjFilename:(NSString *)filename
@@ -24,6 +28,8 @@ TOMModel objectModel()
   filename = [filename stringByReplacingOccurrencesOfString:@".obj" withString:@""];
   NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"obj"];
   NSString *objString = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:&error];
+
+  model = (TOMModel){0};
 
   if (nil == error)
   {
@@ -111,7 +117,7 @@ TOMModel objectModel()
       for (int i = 0; i < 2; i++)
       {
         NSString *item = items[i];
-        texels[texelsIndex][i] = item.doubleValue;
+        texels[texelsIndex][i] = item.floatValue;
       }
 
       texelsIndex++;
@@ -124,7 +130,7 @@ TOMModel objectModel()
       for (int i = 0; i < 3; i++)
       {
         NSString *item = items[i];
-        normals[normalsIndex][i] = item.doubleValue;
+        normals[normalsIndex][i] = item.floatValue;
       }
 
       normalsIndex++;
@@ -141,7 +147,7 @@ TOMModel objectModel()
       for (int i = 0; i < 3; i++)
       {
         NSString *item = items[i];
-        positions[verticiesIndex][i] = item.doubleValue;
+        positions[verticiesIndex][i] = item.floatValue;
       }
 
       verticiesIndex++;
@@ -305,7 +311,7 @@ TOMModel objectModel()
       for (int i = 0; i < 3; i++)
       {
         NSString *item = items[i];
-        model.diffuses[materialIndex][i] = item.doubleValue;
+        model.diffuses[materialIndex][i] = item.floatValue;
       }
     }
     else if ([line hasPrefix:@"Ks"])
@@ -316,7 +322,7 @@ TOMModel objectModel()
       for (int i = 0; i < 3; i++)
       {
         NSString *item = items[i];
-        model.speculars[materialIndex][i] = item.doubleValue;
+        model.speculars[materialIndex][i] = item.floatValue;
       }
     }
     else if ([line hasPrefix:@"map_Kd"])
