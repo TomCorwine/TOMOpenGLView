@@ -184,8 +184,8 @@
   {
     NSError *error;
     NSDictionary *options = @{GLKTextureLoaderOriginBottomLeft: @YES};
-    filename = [filename stringByReplacingOccurrencesOfString:@".jpg" withString:@""];
-    NSString *path = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+    NSString *filenameWithoutExtension = [filename stringByReplacingOccurrencesOfString:@".jpg" withString:@""];
+    NSString *path = [[NSBundle mainBundle] pathForResource:filenameWithoutExtension ofType:@"jpg"];
     if (nil == path)
     {
       NSLog(@"Error locating texture file: %@", path);
